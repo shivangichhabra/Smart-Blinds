@@ -1,0 +1,65 @@
+/*
+	Example: A tip calculation FIS (fuzzy inference system)
+	Calculates tip based on 'servie' and 'food'
+
+	If you want to about this example (and fuzzy logic), please 
+	read Matlab's tutorial on fuzzy logic toolbox 
+	http://www.mathworks.com/access/helpdesk/help/pdf_doc/fuzzy/fuzzy.pdf
+
+									Pablo Cingolani 
+									pcingola@users.sourceforge.net
+*/
+
+FUNCTION_BLOCK tipper	// Block definition (there may be more than one block per file)
+
+VAR_INPUT				// Define input variables
+	TEMPERATURE : REAL;
+	AMBIENT : REAL;
+END_VAR
+
+VAR_OUTPUT				// Define output variable
+	BLIND : REAL;
+END_VAR
+
+FUZZIFY TEMPERATURE			// Fuzzify input variable 'service': {'poor', 'good' , 'excellent'}
+	TERM FREEZING := (0, 0) (0, 1) (25, 0) ; 
+	TERM COLD := (0, 0) (25,1) (50,0) ;
+	TERM COMFORT := (25, 0) (50, 1) (75,0);
+	TERM WARM := (50, 0) (75, 1) (100, 0);
+	TERM HOT := (75, 0) (100, 1) (100, 0);
+END_FUZZIFY
+
+FUZZIFY AMBIENT			// Fuzzify input variable 'food': { 'rancid', 'delicious' }
+	TERM DARK := (0,0) (0, 1) (25, 1) (35,0) ;
+	TERM DIM := (25,0) (50,1) (75,0);
+	TERM BRIGHT := (65,0) (75,1) (100,1) (100,0);
+END_FUZZIFY
+
+DEFUZZIFY BLIND			// Defzzzify output variable 'tip' : {'cheap', 'average', 'generous' }
+	TERM OPEN := (0,0) (0,1) (25,1) (50,0);
+	TERM HALF := (25,0) (50,1) (75,0);
+	TERM CLOSE := (50,0) (75,1) (100,1) (100,0);
+	METHOD : COG;		// Use 'Center Of Gravity' defuzzification method
+	DEFAULT := 0;		// Default value is 0 (if no rule activates defuzzifier)
+END_DEFUZZIFY
+
+RULEBLOCK No1
+	AND : MIN;			// Use 'min' for 'and' (also implicit use 'max' for 'or' to fulfill DeMorgan's Law)
+	ACT : MIN;			// Use 'min' activation method
+	ACCU : MAX;			// Use 'max' accumulation method
+
+	RULE 1: IF TEMPERATURE IS HOT AND AMBIENT IS DIM THEN BLIND IS CLOSE;
+	RULE 2: IF TEMPERATURE IS COLD AND AMBIENT IS BRIGHT THEN BLIND IS HALF;
+	RULE 3: IF TEMPERATURE IS WARM AND AMBIENT IS DIM THEN BLIND IS HALF;
+	RULE 4: IF TEMPERATURE IS WARM AND AMBIENT IS BRIGHT THEN BLIND IS CLOSE;
+	RULE 5: IF AMBIENT IS DARK THEN BLIND IS OPEN;
+	RULE 6: IF TEMPERATURE IS FREEZING THEN BLIND IS CLOSE;
+	RULE 7: IF TEMPERATURE IS COLD AND AMBIENT IS DIM THEN BLIND IS CLOSE;
+	RULE 8: IF TEMPERATURE IS WARM AND AMBIENT IS DARK THEN BLIND IS OPEN;
+	RULE 9: IF TEMPERATURE IS WARM AND AMBIENT IS BRIGHT THEN BLIND IS CLOSE;
+	RULE 10: IF AMBIENT IS DIM THEN BLIND IS HALF;
+	
+END_RULEBLOCK
+
+END_FUNCTION_BLOCK
+

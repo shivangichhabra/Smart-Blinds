@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+<!-- Progress background -->
+<item android:id="@android:id/background">
+    <shape
+        android:shape="ring"
+        android:useLevel="false">
+
+        <solid
+            android:color="#b5b5b5"
+            />
+
+        <stroke
+            android:width="2dp"
+            android:color="#000000"
+            >
+        </stroke>
+
+
+    </shape>
+
+</item>
+
+<!-- Progress -->
+<item android:id="@android:id/progress">
+    <!-- Rotation of the progress to start at the top-->
+    <rotate
+        android:fromDegrees="-90"
+        android:pivotX="50%"
+        android:pivotY="50%"
+        android:toDegrees="-90"
+        >
+        <shape
+            android:shape="ring"
+            android:useLevel="true"
+            android:visible="true"
+            >
+
+            <gradient
+                android:startColor="#ff33cc"
+                android:endColor="#645cf9"
+                 />
+
+
+        </shape>
+    </rotate>
+
+</item>
+</layer-list>
+
